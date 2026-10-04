@@ -327,26 +327,6 @@ class Controller:
             return self.run
         self._event("geometry_ready", geometry=g["geometry"], source=Path(setup["geometry_path"]).name)
 
-        # DEMO: fix the user-supplied mesh objective before the LLM loop.
-        campaign_state = await self.call("get_campaign", {"campaign_id": campaign_id})
-        search = campaign_state.get("campaign", {}).get("search") or {}
-        objective = await self.call("fix_objective", {
-            "campaign_id": campaign_id,
-            "metric": "minSICN",
-            "stat": "min",
-            "threshold": 0.005,
-            "threshold_basis": "demo",
-            "search_lower": search.get("lower", 6.0),
-            "search_upper": search.get("upper", 12.0),
-            "rel_tolerance": search.get("rel_tolerance", 0.1),
-        })
-        if "error" in objective:
-            self.run.stop_reason = f"objective_failed:{objective['error']['kind']}"
-            self._event("stopped", reason=self.run.stop_reason, error=objective["error"])
-            return self.run
-        self._event("objective_fixed", objective=objective)
-
-
         listed = (await self.session.list_tools()).tools
         tools = sorted(({"name": t.name, "description": t.description or "", "input_schema": llm_schema(t.name, t.input_schema)}
                         for t in listed if t.name not in CONTROLLER_TOOLS), key=lambda t: t["name"])
@@ -360,13 +340,7 @@ class Controller:
         while self.run.llm_turns < self.limits.max_llm_turns:
             self.run.llm_turns += 1
             try:
-                # Once the deterministic planner has proposed an experiment,
-                # execution is a controller-owned state transition. Give the
-                # LLM only the execution tool until that proposal is consumed.
-                turn_tools = tools
-                if self.pending_proposal is not None:
-                    turn_tools = [t for t in tools if t["name"] in {"record_interpretation", "run_experiment", "plan_next_experiment"}]
-                turn = self.llm.step(SYSTEM, turn_tools, history)
+                turn = self.llm.step(SYSTEM, tools, history)
             except LLMError as e:
                 self.run.stop_reason = f"llm_error: {e}"[:300]
                 break
