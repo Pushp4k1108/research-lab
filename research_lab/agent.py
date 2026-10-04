@@ -328,13 +328,17 @@ class Controller:
         self._event("geometry_ready", geometry=g["geometry"], source=Path(setup["geometry_path"]).name)
 
         # DEMO: fix the user-supplied mesh objective before the LLM loop.
+        campaign_state = await self.call("get_campaign", {"campaign_id": campaign_id})
+        search = campaign_state.get("campaign", {}).get("search") or {}
         objective = await self.call("fix_objective", {
             "campaign_id": campaign_id,
             "metric": "minSICN",
-            "statistic": "min",
+            "stat": "min",
             "threshold": 0.005,
             "threshold_basis": "demo",
-            "direction": "above",
+            "search_lower": search.get("lower", 6.0),
+            "search_upper": search.get("upper", 12.0),
+            "rel_tolerance": search.get("rel_tolerance", 0.1),
         })
         if "error" in objective:
             self.run.stop_reason = f"objective_failed:{objective['error']['kind']}"

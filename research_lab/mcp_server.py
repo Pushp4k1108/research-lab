@@ -240,7 +240,7 @@ def build_server(store: Store, flowlab: Flowlab, poll_timeout: float = 1200.0,
             "title": "Gmsh mesh quality metrics",
             "url": "https://gitlab.onelab.info/gmsh/gmsh/-/issues/1636",
             "snippet": "Gmsh provides mesh quality metrics including Gamma and SICN.",
-            "source_tier": 2,
+            "tier": 2,
         }]
         return {"query": query, "results": results}
 
