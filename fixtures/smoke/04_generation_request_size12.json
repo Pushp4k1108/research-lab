@@ -1,0 +1,16 @@
+{
+  "body": {
+    "accepted": true,
+    "input_hash": "sha256:a3f7a22ed0f84a0cbfa5fa3ec85d199687bed251045742473ee95885997e902b",
+    "model_id": "243b4d34-103f-4d92-9075-b6e1922967ed",
+    "model_snapshot_hash": "sha256:bcae651ed7b5d4d0ef0eddbc5f8b9b485bda4568929befe99f1c2fa7c4c5fdc9",
+    "poll": {
+      "path": "/api/generations",
+      "query": {
+        "input_hash": "sha256:a3f7a22ed0f84a0cbfa5fa3ec85d199687bed251045742473ee95885997e902b"
+      }
+    },
+    "version": 2
+  },
+  "http_status": 202
+}

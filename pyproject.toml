@@ -1,0 +1,16 @@
+[project]
+name = "research-lab"
+version = "0.0.1"
+requires-python = ">=3.11"
+dependencies = ["httpx", "pydantic", "mcp>=2.3,<3"]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+anthropic = ["anthropic>=1.11,<2"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["research_lab"]

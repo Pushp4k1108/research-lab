@@ -1,0 +1,71 @@
+{
+  "created_at": "2026-09-30T09:26:50.433787Z",
+  "generation": {
+    "boundary_map": {},
+    "configuration": {
+      "boundary_layers": [],
+      "cell_budget": null,
+      "curvature_resolution": 0,
+      "dimension": 3,
+      "element_order": 1,
+      "feature_angle_degrees": 40.0,
+      "intent": "balanced",
+      "min_element_size": null,
+      "schema_version": 1,
+      "seed": 1,
+      "target_element_size": 10.0
+    },
+    "error": null,
+    "geo_script_ref": "sha256:ea8eddc1c2de2833eef87bd0fba6dd05bf31e60ff89e0a4740f323ea1ec70032",
+    "id": "c4c1ff0e-0ef6-4481-84c8-d79627999c8c",
+    "input_hash": "sha256:a6a3afce17003f588853de3bc02fee25744080b4017a2df1f63ec3e4be10a9a2",
+    "mesh_ref": "sha256:0e04b1f7fa7c54450f66609cae95c3558565cb22c3d34ace687a73421cb67e1d",
+    "model_snapshot_hash": "sha256:bcae651ed7b5d4d0ef0eddbc5f8b9b485bda4568929befe99f1c2fa7c4c5fdc9",
+    "parent_generation_id": null,
+    "quality_report": {
+      "bounding_box": {
+        "max": [
+          84.6511290164415,
+          72.44603531865867,
+          84.6511290164415
+        ],
+        "min": [
+          -84.6511290164415,
+          -2.8979132631482067,
+          -84.6511290164415
+        ]
+      },
+      "dimension": 3,
+      "element_count": 5971,
+      "findings": [],
+      "measured_by": "4.15.2",
+      "mesh_ref": "sha256:0e04b1f7fa7c54450f66609cae95c3558565cb22c3d34ace687a73421cb67e1d",
+      "metrics": {
+        "gamma": {
+          "max": 0.9889282109280233,
+          "mean": 0.48425176391973085,
+          "min": 0.0008193876217974124,
+          "orientation": "higher_is_better",
+          "scope": null
+        },
+        "minSICN": {
+          "max": 0.990346053909381,
+          "mean": 0.5166815175497962,
+          "min": 0.0075063817634680365,
+          "orientation": "higher_is_better",
+          "scope": null
+        }
+      },
+      "schema_version": 1,
+      "sections": {},
+      "unmeasured": {}
+    },
+    "run_id": null,
+    "schema_version": 1,
+    "skill_name": "mesh_generate",
+    "skill_version": "1.0.0",
+    "status": "ok"
+  },
+  "generation_id": "c4c1ff0e-0ef6-4481-84c8-d79627999c8c",
+  "status": "ok"
+}

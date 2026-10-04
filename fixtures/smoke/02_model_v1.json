@@ -1,0 +1,21 @@
+{
+  "created_at": "2026-10-03T18:06:38.316656Z",
+  "model": {
+    "boundary_groups": [],
+    "coord_system": {
+      "handedness": "right",
+      "up_axis": "z"
+    },
+    "geometry_provenance": null,
+    "geometry_ref": "sha256:c3d529202ee39c5907ac5e528bc9addfa0979a624227974cf449f975de9b884d",
+    "id": "243b4d34-103f-4d92-9075-b6e1922967ed",
+    "intent_params": {},
+    "units": {
+      "length": "mm"
+    },
+    "version": 1
+  },
+  "model_id": "243b4d34-103f-4d92-9075-b6e1922967ed",
+  "snapshot_hash": "sha256:1acfaa75cd1e3c23e20f4af298332edcee61a37e121bc111089802ef45f32485",
+  "version": 1
+}

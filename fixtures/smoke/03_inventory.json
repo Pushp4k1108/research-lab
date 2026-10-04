@@ -1,0 +1,29 @@
+{
+  "envelope": {
+    "created_at": "2026-10-03T18:06:41.251169Z",
+    "model": {
+      "boundary_groups": [],
+      "coord_system": {
+        "handedness": "right",
+        "up_axis": "z"
+      },
+      "geometry_provenance": {
+        "byte_size": 810687,
+        "inventory_ref": "sha256:915d0261526f6a2d41139cd3ea97a3e95ba9c6be30077e2439f5e5d7a8068323",
+        "source_format": "step",
+        "source_name": "geometry.step"
+      },
+      "geometry_ref": "sha256:c3d529202ee39c5907ac5e528bc9addfa0979a624227974cf449f975de9b884d",
+      "id": "243b4d34-103f-4d92-9075-b6e1922967ed",
+      "intent_params": {},
+      "units": {
+        "length": "mm"
+      },
+      "version": 2
+    },
+    "model_id": "243b4d34-103f-4d92-9075-b6e1922967ed",
+    "snapshot_hash": "sha256:bcae651ed7b5d4d0ef0eddbc5f8b9b485bda4568929befe99f1c2fa7c4c5fdc9",
+    "version": 2
+  },
+  "http_status": 201
+}
