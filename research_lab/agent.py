@@ -219,6 +219,7 @@ class Controller:
                  on_event: Callable[[dict], None] | None = None):
         self.session, self.llm, self.limits, self.on_event = session, llm, limits, on_event
         self.run = AgentRun()
+        self.pending_proposal: dict | None = None
 
     def _event(self, kind: str, **data) -> None:
         if self.on_event is not None:
@@ -234,6 +235,10 @@ class Controller:
         d = await self.call("plan_next_experiment", {"campaign_id": self.run.campaign_id})
         view = _decision_view(d) if "status" in d else d
         self.run.planner_log.append(view)
+        if d.get("status") == "propose":
+            self.pending_proposal = dict(d.get("next_parameters") or {})
+        elif d.get("status") in {"stop", "cannot_plan"}:
+            self.pending_proposal = None
         self._event("planner", decision=view)
         return d
 
@@ -245,6 +250,20 @@ class Controller:
             self.run.refused_calls.append({"tool": name, "reason": "not an available tool"})
             return {"error": {"kind": "unknown_tool", "message": f"{name} is not available"}}
         args = {**args, "campaign_id": self.run.campaign_id}
+        if name == "plan_next_experiment":
+            if self.pending_proposal is not None:
+                return {
+                    "error": {
+                        "kind": "planner_barrier",
+                        "message": (
+                            "An experiment proposal is pending. Execute the "
+                            "planner's exact next_parameters before requesting "
+                            "another plan."
+                        ),
+                        "pending_parameters": self.pending_proposal,
+                    }
+                }
+            return await self.plan()
         if name == "run_experiment":
             gate = await self._gate_experiment(args)
             if gate is not None:
@@ -254,6 +273,7 @@ class Controller:
             if "error" not in out and not out.get("repeat"):
                 self.run.experiments_run += 1
             if "error" not in out:
+                self.pending_proposal = None
                 out["planner_after"] = _decision_view(await self.plan())
             return out
         return await self.call(name, args)
@@ -265,6 +285,17 @@ class Controller:
                               "\"...\", \"rationale\": \"...\"}"}}
         if self.run.experiments_run >= self.limits.max_experiments:
             return {"error": {"kind": "experiment_limit", "message": "agent experiment limit reached"}}
+        if self.pending_proposal is not None:
+            if args.get("parameters") != self.pending_proposal:
+                return {
+                    "error": {
+                        "kind": "parameters_not_planned",
+                        "message": "run the pending planner proposal's exact next_parameters",
+                        "expected": self.pending_proposal,
+                    }
+                }
+            return None
+
         d = await self.plan()
         if d.get("status") != "propose":
             return {"error": {"kind": "planner_refused", "decision": _decision_view(d) if "status" in d else d}}
@@ -296,6 +327,22 @@ class Controller:
             return self.run
         self._event("geometry_ready", geometry=g["geometry"], source=Path(setup["geometry_path"]).name)
 
+        # DEMO: fix the user-supplied mesh objective before the LLM loop.
+        objective = await self.call("fix_objective", {
+            "campaign_id": campaign_id,
+            "metric": "minSICN",
+            "statistic": "min",
+            "threshold": 0.005,
+            "threshold_basis": "demo",
+            "direction": "above",
+        })
+        if "error" in objective:
+            self.run.stop_reason = f"objective_failed:{objective['error']['kind']}"
+            self._event("stopped", reason=self.run.stop_reason, error=objective["error"])
+            return self.run
+        self._event("objective_fixed", objective=objective)
+
+
         listed = (await self.session.list_tools()).tools
         tools = sorted(({"name": t.name, "description": t.description or "", "input_schema": llm_schema(t.name, t.input_schema)}
                         for t in listed if t.name not in CONTROLLER_TOOLS), key=lambda t: t["name"])
@@ -309,7 +356,13 @@ class Controller:
         while self.run.llm_turns < self.limits.max_llm_turns:
             self.run.llm_turns += 1
             try:
-                turn = self.llm.step(SYSTEM, tools, history)
+                # Once the deterministic planner has proposed an experiment,
+                # execution is a controller-owned state transition. Give the
+                # LLM only the execution tool until that proposal is consumed.
+                turn_tools = tools
+                if self.pending_proposal is not None:
+                    turn_tools = [t for t in tools if t["name"] in {"record_interpretation", "run_experiment"}]
+                turn = self.llm.step(SYSTEM, turn_tools, history)
             except LLMError as e:
                 self.run.stop_reason = f"llm_error: {e}"[:300]
                 break
